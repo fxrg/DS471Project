@@ -54,7 +54,8 @@ DS471Project/
 │   └── figures/        # Visualizations and performance plots
 ├── src/
 │   ├── initial_eda.py  # Exploratory data analysis
-│   └── preprocess.py   # Preprocessing pipeline
+│   ├── preprocess.py   # Preprocessing pipeline
+│   └── train_traditional.py # Traditional ML baselines
 ├── requirements.txt
 └── README.md
 ```
@@ -129,9 +130,31 @@ data/processed/test.csv
 
 | Type | Model | Status |
 |---|---|---|
-| Machine Learning | Logistic Regression| ⏳ |
-| Machine Learning |  Random Forest | ⏳ |
+| Machine Learning | Logistic Regression| ✅ Baseline implemented |
+| Machine Learning | Random Forest | ✅ Baseline implemented |
 | Deep Learning |  Multi-Layer Perceptron (Neural Network) | ⏳ |
+
+---
+
+### 3) Traditional ML Baselines
+
+```bash
+python src/train_traditional.py
+```
+
+The script trains both classical models using the training partition only,
+then reports validation and test performance using Accuracy, Precision,
+Recall, F1-Score, and ROC-AUC. Model weights and metrics are not persisted;
+this keeps the baseline run clean for later hyperparameter tuning.
+
+**Baseline results**
+
+| Model | Split | Accuracy | Precision | Recall | F1 | ROC-AUC |
+|---|---|---:|---:|---:|---:|---:|
+| Logistic Regression | Validation | 0.9647 | 1.0000 | 0.9062 | 0.9508 | 0.9965 |
+| Logistic Regression | Test | 0.9767 | 0.9688 | 0.9688 | 0.9688 | 0.9988 |
+| Random Forest | Validation | 0.9529 | 1.0000 | 0.8750 | 0.9333 | 0.9915 |
+| Random Forest | Test | 0.9767 | 1.0000 | 0.9375 | 0.9677 | 0.9977 |
 
 ---
 
