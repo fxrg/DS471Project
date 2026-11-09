@@ -14,11 +14,6 @@ data/raw/*
 !data/raw/.gitkeep
 data/processed/*
 !data/processed/.gitkeep
-reports/figures/*
-!reports/figures/.gitkeep
-reports/*.csv
-reports/*.txt
-
 # Local tooling and temporary files
 .pytest_cache/
 .coverage
