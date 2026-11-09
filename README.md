@@ -55,7 +55,8 @@ DS471Project/
 ├── src/
 │   ├── initial_eda.py  # Exploratory data analysis
 │   ├── preprocess.py   # Preprocessing pipeline
-│   └── train_traditional.py # Traditional ML baselines
+│   ├── train_traditional.py # Traditional ML baselines
+│   └── train_neural_net.py # MLP training pipeline
 ├── requirements.txt
 └── README.md
 ```
@@ -132,7 +133,7 @@ data/processed/test.csv
 |---|---|---|
 | Machine Learning | Logistic Regression| ✅ Baseline implemented |
 | Machine Learning | Random Forest | ✅ Baseline implemented |
-| Deep Learning |  Multi-Layer Perceptron (Neural Network) | ⏳ |
+| Deep Learning |  Multi-Layer Perceptron (Neural Network) | ✅ Baseline implemented |
 
 ---
 
@@ -158,13 +159,38 @@ this keeps the baseline run clean for later hyperparameter tuning.
 
 ---
 
+### 4) Neural Network (MLP)
+
+```bash
+python src/train_neural_net.py
+```
+
+The MLP uses the following architecture:
+
+```text
+30 inputs → 64 (ReLU) → Dropout(0.2) → 32 (ReLU) → 1 output
+```
+
+Training uses Adam with a learning rate of `0.001` and
+`BCEWithLogitsLoss`. Validation loss is tracked every epoch, with early
+stopping and restoration of the best validation checkpoint. The learning
+curve is saved to `reports/figures/mlp_learning_curves.png`.
+
+**MLP baseline results**
+
+| Model | Split | Accuracy | Precision | Recall | F1 | ROC-AUC |
+|---|---|---:|---:|---:|---:|---:|
+| Multi-Layer Perceptron (MLP) | Test | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 |
+
+---
+
 ## 📈 Results
 
 | Model | Accuracy | Precision | Recall | F1 | ROC-AUC |
 |---|---|---|---|---|---|
-| Logistic Regression | – | – | – | – | – |
-| Random Forest | – | – | – | – | – |
-| Multi-Layer Perceptron (MLP) | – | – | – | – | – |
+| Logistic Regression | 0.9767 | 0.9688 | 0.9688 | 0.9688 | 0.9988 |
+| Random Forest | 0.9767 | 1.0000 | 0.9375 | 0.9677 | 0.9977 |
+| Multi-Layer Perceptron (MLP) | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 |
 
 > Plots and figures are available in `reports/figures/`.
 
