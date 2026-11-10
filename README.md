@@ -9,7 +9,7 @@
 ![Python](https://img.shields.io/badge/Python-3.10+-3776AB?logo=python&logoColor=white)
 ![scikit-learn](https://img.shields.io/badge/scikit--learn-ML-F7931E?logo=scikitlearn&logoColor=white)
 ![Jupyter](https://img.shields.io/badge/Jupyter-Notebooks-F37626?logo=jupyter&logoColor=white)
-![Status](https://img.shields.io/badge/Status-In%20Progress-yellow)
+![Status](https://img.shields.io/badge/Status-Complete-brightgreen)
 
 </div>
 
@@ -91,31 +91,35 @@ data/raw/breast_cancer.csv
 
 ## 🚀 How to Run
 
-### 1) Exploratory Data Analysis
+### Quick Start
 
 ```bash
+# Optional initial inspection:
 python src/initial_eda.py
-```
-
-### 2) Preprocessing Pipeline
-
-```bash
+# Required end-to-end pipeline:
 python src/preprocess.py
+python src/train_traditional.py
+python src/train_neural_net.py
+python src/evaluate_tune.py
 ```
 
-This step will:
+The preprocessing step validates the raw file, encodes the target, creates
+stratified train/validation/test splits, and fits scaling on training data
+only. The next two commands train the classical and neural-network
+baselines. The final command runs five-fold tuning on train plus validation
+and evaluates the selected models on the untouched test partition.
 
-1. Validate the input file.
-2. Encode the target: `M → 1`, `B → 0`.
-3. Create **stratified** train / validation / test splits.
-4. Standardize the 30 model features.
+The end-to-end demonstration is available in
+`notebooks/breast_cancer_pipeline_demo.ipynb`.
 
-**Outputs** (local only, ignored by Git):
+**Outputs** (local data and generated figures):
 
 ```text
 data/processed/train.csv
 data/processed/val.csv
 data/processed/test.csv
+reports/figures/mlp_learning_curves.png
+reports/figures/confusion_matrices.png
 ```
 
 ---
@@ -125,6 +129,7 @@ data/processed/test.csv
 - The identifier column is **excluded** from the model features.
 - The scaler is **fitted on the training set only**, then applied to validation and test sets.
 - Splits are **stratified** to preserve the class ratio across partitions.
+- Hyperparameter tuning uses train plus validation folds; the test set remains untouched.
 
 ---
 
@@ -132,64 +137,29 @@ data/processed/test.csv
 
 | Type | Model | Status |
 |---|---|---|
-| Machine Learning | Logistic Regression| ✅ Baseline implemented |
-| Machine Learning | Random Forest | ✅ Baseline implemented |
-| Deep Learning |  Multi-Layer Perceptron (Neural Network) | ✅ Baseline implemented |
+| Machine Learning | Logistic Regression | ✅ Baseline and tuned |
+| Machine Learning | Random Forest | ✅ Baseline and tuned |
+| Deep Learning | Multi-Layer Perceptron (Neural Network) | ✅ Baseline and tuned |
 
 ---
 
-### 3) Traditional ML Baselines
+### Traditional ML Baselines
 
 ```bash
 python src/train_traditional.py
 ```
 
-The script trains both classical models using the training partition only,
-then reports validation and test performance using Accuracy, Precision,
-Recall, F1-Score, and ROC-AUC. Model weights and metrics are not persisted;
-this keeps the baseline run clean for later hyperparameter tuning.
+The baseline models report Accuracy, Precision, Recall, F1-Score, and ROC-AUC
+on validation and test partitions. Model weights and metrics are not persisted
+by the baseline script.
 
-**Baseline results**
-
-| Model | Split | Accuracy | Precision | Recall | F1 | ROC-AUC |
-|---|---|---:|---:|---:|---:|---:|
-| Logistic Regression | Validation | 0.9647 | 1.0000 | 0.9062 | 0.9508 | 0.9965 |
-| Logistic Regression | Test | 0.9767 | 0.9688 | 0.9688 | 0.9688 | 0.9988 |
-| Random Forest | Validation | 0.9529 | 1.0000 | 0.8750 | 0.9333 | 0.9915 |
-| Random Forest | Test | 0.9767 | 1.0000 | 0.9375 | 0.9677 | 0.9977 |
-
----
-
-### 4) Hyperparameter Tuning and Evaluation
-
-```bash
-python src/evaluate_tune.py
-```
-
-This script combines the training and validation partitions for a strict
-5-fold stratified grid search. The test partition remains untouched until
-the best configuration for each model is refit on the combined training
-data. It tunes Logistic Regression, Random Forest, and scikit-learn MLP
-hyperparameters, then reports hold-out test metrics and saves the confusion
-matrices to `reports/figures/confusion_matrices.png`.
-
-**Tuned test results**
-
-| Model | Accuracy | Precision | Recall | F1 | ROC-AUC |
-|---|---:|---:|---:|---:|---:|
-| Logistic Regression | 0.9884 | 1.0000 | 0.9688 | 0.9841 | 1.0000 |
-| Random Forest | 0.9884 | 1.0000 | 0.9688 | 0.9841 | 1.0000 |
-| Multi-Layer Perceptron (MLP) | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 |
-
----
-
-### 5) Neural Network (MLP)
+### Neural Network (MLP)
 
 ```bash
 python src/train_neural_net.py
 ```
 
-The MLP uses the following architecture:
+Architecture:
 
 ```text
 30 inputs → 64 (ReLU) → Dropout(0.2) → 32 (ReLU) → 1 output
@@ -200,15 +170,9 @@ Training uses Adam with a learning rate of `0.001` and
 stopping and restoration of the best validation checkpoint. The learning
 curve is saved to `reports/figures/mlp_learning_curves.png`.
 
-**MLP baseline results**
+### Hyperparameter Tuning and Evaluation
 
-| Model | Split | Accuracy | Precision | Recall | F1 | ROC-AUC |
-|---|---|---:|---:|---:|---:|---:|
-| Multi-Layer Perceptron (MLP) | Test | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 |
-
----
-
-## 📈 Results
+The tuned test results are:
 
 | Model | Accuracy | Precision | Recall | F1 | ROC-AUC |
 |---|---|---|---|---|---|
@@ -216,8 +180,28 @@ curve is saved to `reports/figures/mlp_learning_curves.png`.
 | Random Forest (tuned) | 0.9884 | 1.0000 | 0.9688 | 0.9841 | 1.0000 |
 | Multi-Layer Perceptron (MLP) | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 |
 
-> Plots and figures are available in `reports/figures/`, including the tuned
-> model comparison at `reports/figures/confusion_matrices.png`.
+---
+
+## 📈 Performance Visualizations
+
+![MLP learning curves](reports/figures/mlp_learning_curves.png)
+
+![Tuned model confusion matrices](reports/figures/confusion_matrices.png)
+
+The learning curves show training and validation loss across epochs. The
+confusion matrices show the error distribution for each tuned model on the
+hold-out test set.
+
+---
+
+## 🩺 Medical Context & Takeaways
+
+In breast cancer screening, **recall is critical** because a false negative
+can classify a malignant tumor as benign and delay clinical follow-up.
+Therefore, model selection should consider sensitivity alongside precision,
+F1-score, ROC-AUC, and the cost of false positives. The reported metrics are
+experimental results on this dataset and are not a substitute for clinical
+validation or medical diagnosis.
 
 
 ## 📚 References
