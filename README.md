@@ -56,7 +56,8 @@ DS471Project/
 │   ├── initial_eda.py  # Exploratory data analysis
 │   ├── preprocess.py   # Preprocessing pipeline
 │   ├── train_traditional.py # Traditional ML baselines
-│   └── train_neural_net.py # MLP training pipeline
+│   ├── train_neural_net.py # MLP training pipeline
+│   └── evaluate_tune.py # Cross-validated tuning and test evaluation
 ├── requirements.txt
 └── README.md
 ```
@@ -159,7 +160,30 @@ this keeps the baseline run clean for later hyperparameter tuning.
 
 ---
 
-### 4) Neural Network (MLP)
+### 4) Hyperparameter Tuning and Evaluation
+
+```bash
+python src/evaluate_tune.py
+```
+
+This script combines the training and validation partitions for a strict
+5-fold stratified grid search. The test partition remains untouched until
+the best configuration for each model is refit on the combined training
+data. It tunes Logistic Regression, Random Forest, and scikit-learn MLP
+hyperparameters, then reports hold-out test metrics and saves the confusion
+matrices to `reports/figures/confusion_matrices.png`.
+
+**Tuned test results**
+
+| Model | Accuracy | Precision | Recall | F1 | ROC-AUC |
+|---|---:|---:|---:|---:|---:|
+| Logistic Regression | 0.9884 | 1.0000 | 0.9688 | 0.9841 | 1.0000 |
+| Random Forest | 0.9884 | 1.0000 | 0.9688 | 0.9841 | 1.0000 |
+| Multi-Layer Perceptron (MLP) | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 |
+
+---
+
+### 5) Neural Network (MLP)
 
 ```bash
 python src/train_neural_net.py
@@ -188,11 +212,12 @@ curve is saved to `reports/figures/mlp_learning_curves.png`.
 
 | Model | Accuracy | Precision | Recall | F1 | ROC-AUC |
 |---|---|---|---|---|---|
-| Logistic Regression | 0.9767 | 0.9688 | 0.9688 | 0.9688 | 0.9988 |
-| Random Forest | 0.9767 | 1.0000 | 0.9375 | 0.9677 | 0.9977 |
+| Logistic Regression (tuned) | 0.9884 | 1.0000 | 0.9688 | 0.9841 | 1.0000 |
+| Random Forest (tuned) | 0.9884 | 1.0000 | 0.9688 | 0.9841 | 1.0000 |
 | Multi-Layer Perceptron (MLP) | 1.0000 | 1.0000 | 1.0000 | 1.0000 | 1.0000 |
 
-> Plots and figures are available in `reports/figures/`.
+> Plots and figures are available in `reports/figures/`, including the tuned
+> model comparison at `reports/figures/confusion_matrices.png`.
 
 
 ## 📚 References
